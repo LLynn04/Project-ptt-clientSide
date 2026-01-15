@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { Heart } from "lucide-react"
+import { Heart, Eye, ShoppingCart } from "lucide-react"
 
 interface ProductCardProps {
   product: {
@@ -32,7 +32,7 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const navigate = useNavigate() // ✅ for navigation
+  const navigate = useNavigate()
   const { id, name, product_thumbnail, price, promotions, shop, rating, stock_status } = product
 
   const [isFavorite, setIsFavorite] = useState(false)
@@ -49,13 +49,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     try {
       const token = localStorage.getItem("token")
       const headers: HeadersInit = { Accept: "application/json" }
-
       if (token) headers["Authorization"] = `Bearer ${token}`
 
       const response = await fetch("http://127.0.0.1:8000/api/favorites", { headers })
       if (response.ok) {
         const data = await response.json()
-        let favorites = []
+        let favorites: any[] = []
         if (Array.isArray(data)) favorites = data
         else if (data.data && Array.isArray(data.data)) favorites = data.data
         else if (data.data && typeof data.data === "object")
@@ -70,13 +69,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   }
 
   const handleCardClick = () => {
-    navigate(`/products/${id}`) // ✅ Go to detail page
+    navigate(`/products/${id}`)
   }
 
   const addToCart = async (e: React.MouseEvent) => {
     e.preventDefault()
-    e.stopPropagation() // ✅ prevent triggering card click
-
+    e.stopPropagation()
     if (stock_status !== "In Stock") {
       showToast("This product is out of stock!", "bg-red-500")
       return
@@ -89,7 +87,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         "Content-Type": "application/json",
         Accept: "application/json",
       }
-
       if (token) headers["Authorization"] = `Bearer ${token}`
 
       const response = await fetch("http://127.0.0.1:8000/api/cart", {
@@ -114,8 +111,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   const toggleFavorite = async (e: React.MouseEvent) => {
     e.preventDefault()
-    e.stopPropagation() // ✅ prevent triggering card click
-
+    e.stopPropagation()
     setIsAddingToFav(true)
     try {
       const token = localStorage.getItem("token")
@@ -168,90 +164,103 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <div
       onClick={handleCardClick}
-      className="bg-white rounded-2xl shadow hover:shadow-lg transition-all duration-300 overflow-hidden group relative cursor-pointer"
+      className="bg-[#FAF7F2] rounded-none overflow-hidden group cursor-pointer flex flex-col h-full transition-all duration-300 snap-start"
     >
-      {/* ❤️ Favorite Button */}
-      <button
-        onClick={toggleFavorite}
-        disabled={isAddingToFav}
-        className={`absolute top-3 right-3 z-20 w-9 h-9 rounded-full flex items-center justify-center transition-all shadow-lg ${
-          isFavorite
-            ? "bg-red-500 text-white scale-110"
-            : "bg-white text-gray-600 hover:bg-red-50 hover:text-red-500 hover:scale-110"
-        }`}
-      >
-        {isAddingToFav ? (
-          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-        ) : (
-          <Heart size={18} className={isFavorite ? "fill-current" : ""} strokeWidth={2} />
-        )}
-      </button>
-
-      {/* 🖼️ Image */}
-      <div className="relative w-full h-52 overflow-hidden bg-gray-100">
+      {/* 🖼️ Image Section - NO PADDING, FULL FIT */}
+      <div className="relative w-full aspect-square bg-gray-200 overflow-hidden">
         <img
           src={product_thumbnail || "/placeholder.svg"}
           alt={name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          /* Removed p-6 and changed to object-cover to fit exactly */
+          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
         />
-        {isOnSale && (
-          <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-lg shadow-md z-10">
-            {promotions[0].name}
-          </div>
-        )}
+
+        {/* Dynamic Badges */}
+        <div className="absolute top-4 left-4 flex flex-col gap-2 z-10">
+          {isOnSale && (
+            <span className="bg-[#C19A6B] text-white text-[10px] uppercase tracking-widest font-bold px-3 py-1 rounded-full shadow-sm">
+              {promotions[0].name}
+            </span>
+          )}
+          {price?.has_discount && (
+            <span className="bg-[#D4A373] text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-sm">
+              {price.discount_rate}% OFF
+            </span>
+          )}
+        </div>
+
+        {/* Action Overlay */}
+        <div className="absolute inset-0 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/10 z-10">
+          <button 
+            className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-[#C19A6B] hover:text-white transition-all transform hover:scale-110"
+            title="Quick View"
+          >
+            <Eye size={18} />
+          </button>
+          
+          <button 
+            onClick={toggleFavorite}
+            disabled={isAddingToFav}
+            className={`w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all transform hover:scale-110 ${
+              isFavorite ? "bg-[#C19A6B] text-white" : "bg-white text-gray-700 hover:bg-[#C19A6B] hover:text-white"
+            }`}
+          >
+            {isAddingToFav ? (
+              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <Heart size={18} className={isFavorite ? "fill-current" : ""} />
+            )}
+          </button>
+
+          <button 
+            onClick={addToCart}
+            disabled={isAddingToCart || stock_status !== "In Stock"}
+            className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-[#C19A6B] hover:text-white transition-all transform hover:scale-110"
+          >
+             {isAddingToCart ? (
+                <div className="w-4 h-4 border-2 border-[#C19A6B] border-t-transparent rounded-full animate-spin" />
+             ) : (
+                <ShoppingCart size={18} />
+             )}
+          </button>
+        </div>
+
+        {/* Sold Out Overlay */}
         {stock_status !== "In Stock" && (
-          <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
-            <span className="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold shadow-lg">Out of Stock</span>
+          <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-20">
+            <span className="border-2 border-gray-800 text-gray-800 text-xs font-bold uppercase tracking-widest px-4 py-2">
+              Sold Out
+            </span>
           </div>
         )}
       </div>
 
-      {/* 🛒 Product Info */}
-      <div className="p-4 flex flex-col gap-3">
-        <div>
-          <p className="text-xs text-gray-500 mb-1">{shop?.name || "Unknown Shop"}</p>
-          <h3 className="text-sm font-semibold text-gray-900 line-clamp-2 mb-2">{name}</h3>
-
-          <div className="flex items-center gap-1 mb-2">
-            <div className="flex text-yellow-400">
-              {[...Array(5)].map((_, i) => (
-                <span key={i} className={i < Math.round(rating?.average || 0) ? "text-yellow-400" : "text-gray-300"}>
-                  ★
-                </span>
-              ))}
-            </div>
-            <span className="text-xs text-gray-500">({rating?.count || 0})</span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <span className="text-lg font-bold text-gray-900">${price?.discounted_price || price?.original || 0}</span>
-            {price?.has_discount && (
-              <span className="text-sm text-gray-400 line-through">${price?.original || 0}</span>
-            )}
-          </div>
+      {/* 📝 Product Details */}
+      <div className="pt-5 pb-4 px-2 flex flex-col items-center text-center">
+        <h3 className="text-sm font-semibold text-gray-900 mb-1 truncate w-full uppercase tracking-tight">
+          {name}
+        </h3>
+        
+        {/* Rating Stars */}
+        <div className="flex text-[#E6B17A] text-[10px] mb-2">
+          {[...Array(5)].map((_, i) => (
+            <span key={i} className="mx-0.5">
+              {i < Math.round(rating?.average || 0) ? "★" : "☆"}
+            </span>
+          ))}
         </div>
 
-        {/* 🛒 Add to Cart */}
-        <button
-          onClick={addToCart}
-          disabled={isAddingToCart || stock_status !== "In Stock"}
-          className={`w-full py-2 px-4 rounded-lg font-medium transition-all ${
-            stock_status !== "In Stock"
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : isAddingToCart
-              ? "bg-gray-400 text-white"
-              : "bg-gradient-to-r from-[#E07A5F] to-[#F4A261] text-white hover:opacity-90"
-          }`}
-        >
-          {isAddingToCart ? (
-            <div className="flex items-center justify-center gap-2">
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              Adding...
-            </div>
-          ) : (
-            "Add to Cart"
+        {/* Price */}
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-bold text-[#C19A6B]">
+            USD {price?.discounted_price || price?.original || 0}.00
+          </span>
+          {price?.has_discount && (
+            <span className="text-xs text-gray-400 line-through">
+              USD {price?.original || 0}.00
+            </span>
           )}
-        </button>
+        </div>
       </div>
     </div>
   )

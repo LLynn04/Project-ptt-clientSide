@@ -34,6 +34,7 @@ import Orders from "./pages/admin/pages/Orders.tsx";
 import Customers from "./pages/admin/pages/Customers.tsx";
 import ShopesManage from "./pages/admin/pages/Shops.tsx";
 import RequestSeller from "./pages/admin/pages/RequestSeller.tsx";
+// import PromotionProducts from "./components/products/PromotionProducts.tsx";
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
           {/* Products routes */}
           <Route path="products" element={<ProductsPage />} />
           <Route path="products/:id" element={<ProductsDetail />} />
+          {/* <Route path="promotion-products" element={<PromotionProducts />} /> */}
 
           {/* Cart and Favorites */}
           <Route path="favorites" element={<AddFavorite />} />
