@@ -31,7 +31,7 @@ const ProductList = () => {
     <section className="py-12 bg-[#FDFBF9]">
       <div className="text-center mb-10">
         <span className="text-[10px] uppercase tracking-[3px] text-[#C19A6B] font-bold bg-[#F1EDE7] px-3 py-1 rounded">
-          Top Sale
+          Products
         </span>
         <h2 className="text-3xl font-bold text-gray-900 mt-4">Featured Product</h2>
       </div>

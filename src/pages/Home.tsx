@@ -1,7 +1,7 @@
 import Banner from "../components/Banner";
 import CategoryGrid from "../components/Categories";
 import ProductView from "../components/products/ProductView";
-import PromotionsComponent from "../components/products/PromotionProducts";
+import TopSale from "../components/products/TopSale";
 
 const Home = () => {
   return (
@@ -16,15 +16,17 @@ const Home = () => {
             <CategoryGrid />
         </section>
 
+        {/* promotions section */}
+        <section >
+            <TopSale />
+        </section>
+
         {/* products section */}
         <section >
             <ProductView />
         </section>
 
-        {/* promotions section */}
-        <section >
-            <PromotionsComponent />
-        </section>
+        
     </main>
   )
 }

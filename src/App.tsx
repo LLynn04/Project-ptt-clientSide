@@ -36,6 +36,9 @@ import ShopesManage from "./pages/admin/pages/Shops.tsx";
 import RequestSeller from "./pages/admin/pages/RequestSeller.tsx";
 // import PromotionProducts from "./components/products/PromotionProducts.tsx";
 
+// seller
+import SellersDashboard from "./pages/Seller/SellersDashboard.tsx";
+
 function App() {
   return (
     <BrowserRouter>
@@ -70,6 +73,9 @@ function App() {
         <Route path="admin/customers" element={<Customers />} />
         <Route path="admin/shops" element={<ShopesManage />} />
         <Route path="admin/seller-requests" element={<RequestSeller />} />
+
+        {/* Seller Dashboard */}
+        <Route path="seller" element={<SellersDashboard />} />
 
         {/* Auth routes */}
         <Route path="/sign-up" element={<Register />} />

@@ -11,6 +11,7 @@ interface ProductCardProps {
     name: string
     description: string
     product_thumbnail: string
+    qty_in_stock: number // Added this to interface
     price: {
       original: number
       discounted_price: number
@@ -33,7 +34,7 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const navigate = useNavigate()
-  const { id, name, product_thumbnail, price, promotions, shop, rating, stock_status } = product
+  const { id, name, product_thumbnail, price, promotions, shop, rating, stock_status, qty_in_stock } = product
 
   const [isFavorite, setIsFavorite] = useState(false)
   const [isAddingToCart, setIsAddingToCart] = useState(false)
@@ -75,7 +76,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const addToCart = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    if (stock_status !== "In Stock") {
+    // UPDATED: Check qty instead of string
+    if (qty_in_stock <= 0) {
       showToast("This product is out of stock!", "bg-red-500")
       return
     }
@@ -171,7 +173,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <img
           src={product_thumbnail || "/placeholder.svg"}
           alt={name}
-          /* Removed p-6 and changed to object-cover to fit exactly */
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
         />
 
@@ -214,7 +215,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
           <button 
             onClick={addToCart}
-            disabled={isAddingToCart || stock_status !== "In Stock"}
+            // UPDATED: Check qty instead of string
+            disabled={isAddingToCart || qty_in_stock <= 0}
             className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-lg hover:bg-[#C19A6B] hover:text-white transition-all transform hover:scale-110"
           >
              {isAddingToCart ? (
@@ -226,7 +228,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
 
         {/* Sold Out Overlay */}
-        {stock_status !== "In Stock" && (
+        {/* UPDATED: Check qty instead of string */}
+        {qty_in_stock <= 0 && (
           <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-20">
             <span className="border-2 border-gray-800 text-gray-800 text-xs font-bold uppercase tracking-widest px-4 py-2">
               Sold Out
